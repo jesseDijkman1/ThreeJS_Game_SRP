@@ -225,9 +225,5 @@ function render() {
   renderer.render(scene, camera);
 }
 
-window.addEventListener("click", (e) => {
-  gun.fire();
-});
-
 window.addEventListener("resize", resize);
 window.requestAnimationFrame(animate);

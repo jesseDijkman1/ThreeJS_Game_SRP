@@ -13,6 +13,9 @@ class SpaceShip {
   maxVelocity: THREE.Vector3;
   acceleration: number;
 
+  tiltingVelocity: THREE.Vector3;
+  rotationVelocity: THREE.Vector3;
+
   _onLoadCallback: (SpaceShip) => void;
 
   constructor(scene: THREE.Scene, filePath: string, state) {
@@ -24,8 +27,9 @@ class SpaceShip {
     this.maxVelocity = new THREE.Vector3(0.25, 0, 1);
     this.velocity = new THREE.Vector3(0, 0, 1);
     this.acceleration = -0.05;
-    // this.acceleration = new THREE.Vector3(0.25, 0.25, 1);
-    // this.decceleration = new THREE.Vector3(-0.00025, -0.00025, -0.0001);
+
+    this.tiltingVelocity = new THREE.Vector3(0, 0, 0);
+    this.rotationVelocity = new THREE.Vector3(0, 0, 0);
 
     this.state = state;
     this._onLoadCallback = null;
@@ -45,7 +49,6 @@ class SpaceShip {
   }
 
   done(gltfScene) {
-    // console.log(gltfScene);
     this.scene.add(gltfScene.scene);
     this.entity = gltfScene.scene.children[0];
     this._onLoadCallback(this);
@@ -58,7 +61,6 @@ class SpaceShip {
   }
 
   update(timeElapsed) {
-    // console.log(timeElapsed);
     if (this.entity === null) return;
     if (this.entity.userData.cameraLocked === false) return;
 
@@ -69,107 +71,64 @@ class SpaceShip {
 
     const currentInputState = this.state.getState();
 
-    if (currentInputState.rotateLeft) {
+    if (currentInputState.rotateLeft || this.rotationVelocity.z > 0) {
+      if (currentInputState.rotateLeft) {
+        this.rotationVelocity.lerp(new THREE.Vector3(0, 0, 1), timeElapsed * 4);
+      }
+
       _A.set(0, 0, 1);
-      _Q.setFromAxisAngle(_A, Math.PI * timeElapsed);
+      _Q.setFromAxisAngle(_A, Math.PI * timeElapsed * this.rotationVelocity.z);
       _R.multiply(_Q);
     }
 
-    if (currentInputState.rotateRight) {
+    if (currentInputState.rotateRight || this.rotationVelocity.z < 0) {
+      if (currentInputState.rotateRight) {
+        this.rotationVelocity.lerp(
+          new THREE.Vector3(0, 0, -1),
+          timeElapsed * 4
+        );
+      }
+
       _A.set(0, 0, 1);
-      _Q.setFromAxisAngle(_A, -Math.PI * timeElapsed);
+      _Q.setFromAxisAngle(_A, Math.PI * timeElapsed * this.rotationVelocity.z);
       _R.multiply(_Q);
     }
 
-    if (currentInputState.tiltUp) {
+    if (currentInputState.tiltUp || this.tiltingVelocity.x > 0) {
+      if (currentInputState.tiltUp) {
+        this.tiltingVelocity.lerp(new THREE.Vector3(1, 0, 0), timeElapsed * 4);
+      }
       _A.set(1, 0, 0);
-      _Q.setFromAxisAngle(_A, Math.PI * timeElapsed);
+      _Q.setFromAxisAngle(_A, Math.PI * timeElapsed * this.tiltingVelocity.x);
       _R.multiply(_Q);
     }
 
-    if (currentInputState.tiltDown) {
+    if (currentInputState.tiltDown || this.tiltingVelocity.x < 0) {
+      if (currentInputState.tiltDown) {
+        this.tiltingVelocity.lerp(new THREE.Vector3(-1, 0, 0), timeElapsed * 4);
+      }
+
       _A.set(1, 0, 0);
-      _Q.setFromAxisAngle(_A, -Math.PI * timeElapsed);
+      _Q.setFromAxisAngle(_A, Math.PI * timeElapsed * this.tiltingVelocity.x);
       _R.multiply(_Q);
     }
 
     controlObject.quaternion.copy(_R);
 
-    // const oldPosition = new THREE.Vector3();
-    // oldPosition.copy(controlObject.position);
-
     const forward = new THREE.Vector3(0, 0, 1);
 
     forward.applyQuaternion(controlObject.quaternion);
-    // forward.normalize();
-
-    // if (currentInputState.boost) {
-    //   console.log("oi");
-    //   // const acc = new THREE.Vector3(0, 0, 0.001);
-    //   // forward.add(acc);
-    // }
-
-    // const sideways = new THREE.Vector3(0, 0, 0);
-    // sideways.applyQuaternion(controlObject.quaternion);
-    // sideways.normalize();
 
     forward.multiplyScalar(this.acceleration);
-    // sideways.multiplyScalar(0.005);
-
-    // console.log(fo)
-    // console.log(forward);
     controlObject.position.add(forward);
-    // controlObject.position.add(sideways);
-    // d;
-    // const t = 1.0 - Math.pow(0.001, timeElapsed);
 
-    // const desiredRotation = new THREE.Vector3();
-    // desiredRotation.x = this.entity.rotation.x;
-    // desiredRotation.y = this.entity.rotation.y;
-    // desiredRotation.z = this.entity.rotation.z;
-    // // const rotation = new THREE.Vector3(0, 0, 0)
+    if (!currentInputState.rotateRight && !currentInputState.rotateLeft) {
+      this.rotationVelocity.lerp(new THREE.Vector3(0, 0, 0), timeElapsed * 2);
+    }
 
-    // if (currentInputState.rotateLeft) {
-    //   // desiredRotation.z = 0.2;
-    //   // desiredRotation.y = 0.7;
-    //   // this.entity.rotation.lerp(0.3, t);
-    //   desiredRotation.y += 0.1;
-    // }
-
-    // if (currentInputState.rotateRight) {
-    //   desiredRotation.y -= 0.1;
-    //   // desiredRotation.z = -0.2;
-    //   // desiredRotation.y = -0.7;
-    // }
-
-    // if (currentInputState.tiltUp) {
-    //   desiredRotation.x += 0.1;
-    //   // desiredRotation.x = 0.7;
-    //   // desiredRotation.y = 0;
-    // }
-
-    // if (currentInputState.tiltDown) {
-    //   desiredRotation.x -= 0.1;
-    //   // desiredRotation.x = -0.7;a
-    //   // desiredRotation.y = 0;
-    // }
-
-    // // const quaternion = this.entity.quaternion.clone();
-    // // quaternion.setFromAxisAngle(desiredRotation, Math.PI / 30);
-
-    // // const vector = new THREE.Vector3( 1, 0, 0 );
-    // // this.entity.applyQuaternion(quaternion);
-
-    // // this.currentRotation.applyQuaternion(this.entity.quaternion);
-    // // this.currentRotation.normalize();
-    // this.currentRotation.lerp(desiredRotation, t);
-    // // var axis = new THREE.Vector3(0, 1, 0);
-    // // this.entity.lookAt(this.currentRotation);
-    // // this.entity.rotateOnAxis(axis, 0.1);
-    // this.entity.rotation.x = this.currentRotation.x;
-    // this.entity.rotation.y = this.currentRotation.y;
-    // this.entity.rotation.z = this.currentRotation.z;
-    // this.entity.translateZ(-0.005);
+    if (!currentInputState.tiltUp && !currentInputState.tiltDown) {
+      this.tiltingVelocity.lerp(new THREE.Vector3(0, 0, 0), timeElapsed * 2);
+    }
   }
 
   error(error) {}
