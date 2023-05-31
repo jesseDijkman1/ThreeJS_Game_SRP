@@ -58,15 +58,17 @@ class SpaceShip {
   }
 
   done(gltfScene) {
-    this.scene.add(gltfScene.scene);
     this.entity = gltfScene.scene.children[0];
 
     this.entity.userData.box = new THREE.Box3();
     this.entity.userData.box.setFromObject(this.entity);
+    // this.entity.userData.box.applyMatrix4(this.entity.matrixWorld);
 
     // this.box.
     this.helper = new THREE.BoxHelper(this.entity, 0xffff00);
     this.scene.add(this.helper);
+
+    this.scene.add(gltfScene.scene);
 
     this._onLoadCallback(this);
   }
@@ -154,16 +156,18 @@ class SpaceShip {
 
     if (this.helper) {
       this.helper.update();
-      this.entity.userData.box.setFromObject(this.entity);
 
       // let v = new THREE.Vector3();
       // this.entity.userData.box.getCenter(v);
       // console.log(v);
     }
+
+    this.entity.userData.box.setFromObject(this.entity);
+    // this.entity.userData.box.applyMatrix4(this.entity.matrixWorld);
   }
 
   explode() {
-    this.velocity = new THREE.Vector3(0, 0, 0);
+    this.velocity = new THREE.Vector3(0, 0, 0.05);
   }
 
   error(error) {}

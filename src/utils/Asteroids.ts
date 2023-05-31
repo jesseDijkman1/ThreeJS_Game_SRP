@@ -64,6 +64,19 @@ class Asteroids {
         const sphere = new THREE.Sphere();
         sphere.copy(clonedAsteroid.geometry.boundingSphere);
         clonedAsteroid.userData.sphere = sphere;
+        // clonedAsteroid.userData.sphere.applyMatrix4(entity.matrixWorld);
+
+        const r = new THREE.Mesh(
+          new THREE.SphereGeometry(sphere.radius, 10, 10),
+          new THREE.MeshBasicMaterial({
+            color: 0xff0000,
+            transparent: true,
+            wireframe: true,
+            opacity: 0,
+          })
+        );
+
+        clonedAsteroid.add(r);
 
         this.entities.push(clonedAsteroid);
         this.scene.add(clonedAsteroid);
@@ -92,6 +105,11 @@ class Asteroids {
       entity.geometry.computeBoundingSphere();
       entity.userData.sphere.copy(entity.geometry.boundingSphere);
       entity.userData.sphere.applyMatrix4(entity.matrixWorld);
+
+      if (entity.userData.hits) {
+        entity.children[0].material.opacity = entity.userData.hits / 10;
+        // console.log(entity)
+      }
       // entity.geometry.boundingSphere.applyMatrix4(entity.matrixWorld);
     });
   }

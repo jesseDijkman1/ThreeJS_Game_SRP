@@ -93,6 +93,10 @@ class Gun {
       entity.userData.life = (entity.userData.life ?? 0) + 0.1;
 
       if (entity.userData.life >= this.lifeSpan) this.scene.remove(entity);
+
+      entity.geometry.computeBoundingBox();
+      entity.userData.box.copy(entity.geometry.boundingBox);
+      entity.userData.box.applyMatrix4(entity.matrixWorld);
     });
 
     this.entities = this.entities.filter(
@@ -104,7 +108,11 @@ class Gun {
     const size = 0.05;
     const geometry = new THREE.BoxGeometry(size, size, size);
     const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-    return new THREE.Mesh(geometry, material);
+    const mesh = new THREE.Mesh(geometry, material);
+
+    mesh.userData.box = new THREE.Box3();
+
+    return mesh;
   }
 
   setShip(target: THREE.Mesh) {
@@ -179,14 +187,19 @@ scene.add(collisionBox);
 const spaceShip = new SpaceShip(scene, "assets/spaceship.glb", inputState);
 const gun = new Gun(scene, inputState);
 
+let asteroidsLoaded = false;
+let spaceshipLoaded = false;
 spaceShip.onLoad(({ entity }) => {
   thirdPersonCamera.setTarget(entity);
   gun.setShip(entity);
+  spaceshipLoaded = true;
 });
 
 const asteroids = new Asteroids(scene, "assets/asteroids.glb");
 
-asteroids.onLoad(({ entities }) => {});
+asteroids.onLoad(({ entities }) => {
+  asteroidsLoaded = true;
+});
 
 // console.log(scene);
 
@@ -210,12 +223,31 @@ function animate(timestamp) {
   }
 
   const roids = asteroids.getEntities();
+  // console.log(roids);
 
-  for (let i = 0; i < roids.length; i++) {
-    if (
-      spaceShip.entity.userData.box.intersectsSphere(roids[i].userData.sphere)
-    ) {
-      spaceShip.explode();
+  if (asteroidsLoaded && spaceshipLoaded) {
+    for (let i = 0; i < roids.length; i++) {
+      if (
+        spaceShip.entity.userData.box.intersectsSphere(roids[i].userData.sphere)
+      ) {
+        // roids[i].userData.hits = (roids[i].userData.hits ?? 0) + 1;
+        spaceShip.explode();
+      }
+    }
+  }
+
+  for (let i = 0; i < gun.entities.length; i++) {
+    const bullet = gun.entities[i];
+    // let hit = false
+    // bullet.geometry.computeBoundingBox();
+
+    for (let i = 0; i < roids.length; i++) {
+      if (bullet.userData.box.intersectsSphere(roids[i].userData.sphere)) {
+        roids[i].userData.hits = (roids[i].userData.hits ?? 0) + 1;
+        bullet.userData.life = Infinity;
+
+        break;
+      }
     }
   }
 
