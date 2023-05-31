@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { OBB } from "three/examples/jsm/math/OBB";
 
 class SpaceShip {
   scene: THREE.Scene;
@@ -9,9 +10,14 @@ class SpaceShip {
   currentRotation: THREE.Vector3;
   state: any;
 
-  velocity: THREE.Vector3;
-  maxVelocity: THREE.Vector3;
   acceleration: number;
+
+  maxVelocity: THREE.Vector3;
+  minVelocity: THREE.Vector3;
+  velocity: THREE.Vector3;
+
+  box: any;
+  helper: any;
 
   tiltingVelocity: THREE.Vector3;
   rotationVelocity: THREE.Vector3;
@@ -24,9 +30,12 @@ class SpaceShip {
     this.filePath = filePath;
     this.entity = null;
 
-    this.maxVelocity = new THREE.Vector3(0.25, 0, 1);
-    this.velocity = new THREE.Vector3(0, 0, 1);
     this.acceleration = -0.05;
+
+    this.maxVelocity = new THREE.Vector3(0, 0, -0.25);
+    this.minVelocity = new THREE.Vector3(0, 0, -0.05);
+
+    this.velocity = new THREE.Vector3(0, 0, -0.05);
 
     this.tiltingVelocity = new THREE.Vector3(0, 0, 0);
     this.rotationVelocity = new THREE.Vector3(0, 0, 0);
@@ -51,6 +60,14 @@ class SpaceShip {
   done(gltfScene) {
     this.scene.add(gltfScene.scene);
     this.entity = gltfScene.scene.children[0];
+
+    this.entity.userData.box = new THREE.Box3();
+    this.entity.userData.box.setFromObject(this.entity);
+
+    // this.box.
+    this.helper = new THREE.BoxHelper(this.entity, 0xffff00);
+    this.scene.add(this.helper);
+
     this._onLoadCallback(this);
   }
 
@@ -113,13 +130,18 @@ class SpaceShip {
       _R.multiply(_Q);
     }
 
+    this.velocity.lerp(
+      currentInputState.boost ? this.maxVelocity : this.minVelocity,
+      timeElapsed
+    );
+
     controlObject.quaternion.copy(_R);
 
     const forward = new THREE.Vector3(0, 0, 1);
 
     forward.applyQuaternion(controlObject.quaternion);
 
-    forward.multiplyScalar(this.acceleration);
+    forward.multiplyScalar(this.velocity.z);
     controlObject.position.add(forward);
 
     if (!currentInputState.rotateRight && !currentInputState.rotateLeft) {
@@ -129,6 +151,19 @@ class SpaceShip {
     if (!currentInputState.tiltUp && !currentInputState.tiltDown) {
       this.tiltingVelocity.lerp(new THREE.Vector3(0, 0, 0), timeElapsed * 2);
     }
+
+    if (this.helper) {
+      this.helper.update();
+      this.entity.userData.box.setFromObject(this.entity);
+
+      // let v = new THREE.Vector3();
+      // this.entity.userData.box.getCenter(v);
+      // console.log(v);
+    }
+  }
+
+  explode() {
+    this.velocity = new THREE.Vector3(0, 0, 0);
   }
 
   error(error) {}

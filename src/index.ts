@@ -6,6 +6,9 @@ import SpaceShip from "./utils/SpaceShip";
 import Asteroids from "./utils/Asteroids";
 import ThirdPersonCamera from "./utils/ThirdPersonCamera";
 import { InputController, InputState } from "./utils/InputController";
+import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
 
 class Gun {
   position: THREE.Vector3;
@@ -108,12 +111,10 @@ class Gun {
     this.ship = target;
 
     target.traverse((data) => {
-      console.log(data);
       if (data.name.includes("Blaster")) {
         const t = new THREE.Vector3(0, 0, 0);
         this.blasters.push(data as THREE.Mesh);
         data.getWorldPosition(t);
-        console.log(data.name, t);
       }
     });
   }
@@ -167,17 +168,20 @@ const inputController = new InputController(renderer, inputState);
 
 // Models
 
+const collisionBox = new THREE.Mesh(
+  new THREE.BoxGeometry(1, 1, 1),
+  new THREE.MeshBasicMaterial({ color: 0xff0000 })
+);
+collisionBox.position.z = -10;
+
+scene.add(collisionBox);
+
 const spaceShip = new SpaceShip(scene, "assets/spaceship.glb", inputState);
 const gun = new Gun(scene, inputState);
 
 spaceShip.onLoad(({ entity }) => {
-  // entity.position.z = -1;
-  // entity.position.y = -0.25;
-  // const gun = new Gun(scene);
   thirdPersonCamera.setTarget(entity);
   gun.setShip(entity);
-
-  entity.rotateLeft(180);
 });
 
 const asteroids = new Asteroids(scene, "assets/asteroids.glb");
@@ -205,10 +209,17 @@ function animate(timestamp) {
     previousTimeStamp = timestamp;
   }
 
-  const timeElapsed = (timestamp - previousTimeStamp) * 0.001;
-  // const currentInputState = inputState.getState();
+  const roids = asteroids.getEntities();
 
-  // console.log(currentInputState);
+  for (let i = 0; i < roids.length; i++) {
+    if (
+      spaceShip.entity.userData.box.intersectsSphere(roids[i].userData.sphere)
+    ) {
+      spaceShip.explode();
+    }
+  }
+
+  const timeElapsed = (timestamp - previousTimeStamp) * 0.001;
 
   spaceShip.update(timeElapsed);
   asteroids.update();

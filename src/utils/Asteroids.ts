@@ -59,6 +59,12 @@ class Asteroids {
         clonedAsteroid.position.y = Math.random() * 50 - 25;
         clonedAsteroid.position.z = Math.random() * 50 - 25;
 
+        clonedAsteroid.geometry.computeBoundingSphere();
+
+        const sphere = new THREE.Sphere();
+        sphere.copy(clonedAsteroid.geometry.boundingSphere);
+        clonedAsteroid.userData.sphere = sphere;
+
         this.entities.push(clonedAsteroid);
         this.scene.add(clonedAsteroid);
       }
@@ -73,11 +79,20 @@ class Asteroids {
     this._onLoadCallback = callback;
   }
 
+  getEntities() {
+    return this.entities;
+  }
+
   update() {
     this.entities.forEach((entity) => {
       entity.rotation.x += entity.userData.rotationV.x;
       entity.rotation.y += entity.userData.rotationV.y;
       entity.rotation.z += entity.userData.rotationV.z;
+
+      entity.geometry.computeBoundingSphere();
+      entity.userData.sphere.copy(entity.geometry.boundingSphere);
+      entity.userData.sphere.applyMatrix4(entity.matrixWorld);
+      // entity.geometry.boundingSphere.applyMatrix4(entity.matrixWorld);
     });
   }
 
