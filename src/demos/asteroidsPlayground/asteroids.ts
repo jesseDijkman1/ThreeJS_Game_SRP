@@ -4,12 +4,13 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 
 class Asteroid {
-  constructor(scene, object, animations) {
+  constructor(scene, gltf) {
     this.scene = scene;
-    this.object = object;
-    this.clips = animations;
+    this.container = gltf.scene.getObjectByName("Empty");
+    this.body = gltf.scene.getObjectByName("Asteroid");
+    this.clips = gltf.animations;
     this.animations = [];
-    this.mixer = new THREE.AnimationMixer(object);
+    this.mixer = new THREE.AnimationMixer(this.container);
     // this.mixer = new THREE.AnimationMixer(object);
 
     this.init();
@@ -24,7 +25,7 @@ class Asteroid {
       return animation;
     });
 
-    this.scene.add(this.object);
+    this.scene.add(this.container);
     //   const animation = this.mixer.clipAction(clip);
     //   animation.setLoop(THREE.LoopOnce, 1);
 
@@ -36,6 +37,7 @@ class Asteroid {
   }
 
   explode() {
+    this.body.visible = false;
     this.animations.forEach((animation) => {
       animation.play();
     });
@@ -94,7 +96,8 @@ class Asteroids {
 
   done(resolve) {
     return (gltf) => {
-      this.asteroid = new Asteroid(this.scene, gltf.scene, gltf.animations);
+      // const object = ;
+      this.asteroid = new Asteroid(this.scene, gltf);
       // let groups = Array(8)
       //   .fill(null)
       //   .map(() => []);

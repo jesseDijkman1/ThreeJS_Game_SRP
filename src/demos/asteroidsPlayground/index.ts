@@ -100,7 +100,7 @@ export default function () {
   }
 
   async function init() {
-    asteroids = new Asteroids(scene, "assets/asteroids-2.glb");
+    asteroids = new Asteroids(scene, "assets/asteroid-1.glb");
 
     // scene.add(boxMesh);
     render();
