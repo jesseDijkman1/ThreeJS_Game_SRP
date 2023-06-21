@@ -100,17 +100,17 @@ export default function () {
   }
 
   async function init() {
-    asteroids = new Asteroids(scene, "assets/asteroid-1.glb");
-    // asteroids = new Asteroids(scene, [
-    //   "assets/asteroid-1.glb",
-    //   "assets/asteroid-2.glb",
-    //   "assets/asteroid-3.glb",
-    //   "assets/asteroid-4.glb",
-    //   "assets/asteroid-5.glb",
-    //   "assets/asteroid-6.glb",
-    //   "assets/asteroid-7.glb",
-    //   "assets/asteroid-8.glb",
-    // ]);
+    // asteroids = new Asteroids(scene, "assets/asteroid-1.glb");
+    asteroids = new Asteroids(scene, [
+      "assets/asteroid-1.glb",
+      "assets/asteroid-2.glb",
+      "assets/asteroid-3.glb",
+      "assets/asteroid-4.glb",
+      "assets/asteroid-5.glb",
+      "assets/asteroid-6.glb",
+      "assets/asteroid-7.glb",
+      "assets/asteroid-8.glb",
+    ]);
 
     // scene.add(boxMesh);
     render();
@@ -118,16 +118,26 @@ export default function () {
 
     try {
       await asteroids.load();
+      asteroids.render();
       // mixers.push(asteroids.mixer);
       // console.log(asteroids);
     } catch (err) {
       console.error(err);
     }
 
-    window.addEventListener(
-      "click",
-      clickHandler(asteroids.getClickableAsteroids())
-    );
+    window.addEventListener("click", (e) => {
+      windowProps.pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
+      windowProps.pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+      raycaster.setFromCamera(windowProps.pointer, camera);
+
+      const clickedAsteroid = asteroids.getClickedAsteroid(raycaster);
+
+      if (clickedAsteroid) {
+        clickedAsteroid.explode();
+      }
+      console.log(clickedAsteroid);
+    });
     window.addEventListener("resize", resize);
     window.requestAnimationFrame(animate);
   }
