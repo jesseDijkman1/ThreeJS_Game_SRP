@@ -44,8 +44,6 @@ class AsteroidInstance {
     this.container.position.copy(position);
     this.container.rotation.copy(new THREE.Euler().setFromVector3(rotation));
 
-    // console.log(this.container);
-
     this.container.userData.positionV = positionV;
     this.container.userData.rotationV = rotationV;
 
@@ -75,10 +73,6 @@ class AsteroidInstance {
       return animation;
     });
   }
-
-  // render(scene) {
-
-  // }
 
   update(deltaT) {
     this.updatePosition();
@@ -142,11 +136,7 @@ class Asteroid {
     this.gltfScene = null;
     this.gltfAnimations = null;
 
-    // this.animations = [];
-
     this.instances = [];
-
-    // this.mixer = null;
   }
 
   // Creates an instance (clone)
@@ -173,44 +163,6 @@ class Asteroid {
 
   progress() {}
 
-  // initModel(gltfScene) {
-  //   gltfScene.traverse((child: THREE.Mesh) => {
-  //     if (CONTAINER_NAME_REGEX.test(child.name)) {
-  //       this.container = child;
-  //     } else if (BODY_NAME_REGEX.test(child.name)) {
-  //       this.body = child;
-  //     } else {
-  //       this.cells.push(child);
-  //     }
-  //   });
-
-  //   // this.scene.add(this.container);
-  // }
-
-  // initAnimations(gltfAnimations) {
-  //   this.mixer = new THREE.AnimationMixer(this.container);
-
-  //   this.animations = gltfAnimations.map((clip) => {
-  //     const animation = this.mixer.clipAction(clip);
-  //     animation.setLoop(THREE.LoopOnce, 1);
-  //     animation.clampWhenFinished = true;
-
-  //     return animation;
-  //   });
-  // }
-
-  // updatePosition() {
-  //   const { x, y, z } = this.container.userData.positionV;
-
-  //   this.container.position.x += x;
-  //   this.container.position.y += y;
-  //   this.container.position.z += z;
-  // }
-
-  // updateMixer(deltaT) {
-  //   this.mixer.update(deltaT);
-  // }
-
   // Public methods
 
   load() {
@@ -224,54 +176,10 @@ class Asteroid {
     });
   }
 
-  render(
-    position: THREE.Vector3,
-    rotation: THREE.Vector3 = new THREE.Vector3(),
-    positionV: THREE.Vector3 = new THREE.Vector3(),
-    rotationV: THREE.Vector3 = new THREE.Vector3()
-  ) {
-    // console.log("clone", this.container.clone(), this.container.clone());
-    this.cells.forEach((cell) => (cell.visible = false));
-
-    this.container.position.copy(position);
-    this.container.rotation.copy(new THREE.Euler().setFromVector3(rotation));
-
-    this.container.userData.positionV = positionV;
-    this.container.userData.rotationV = rotationV;
-
-    this.scene.add(this.container);
-  }
-
   update(deltaT) {
-    this.updatePosition();
-    this.updateRotation();
-    this.updateMixer(deltaT);
-  }
-
-  explode() {
-    let finishedAnimations = 0;
-
-    const handleFinishedEvent = (e) => {
-      finishedAnimations++;
-
-      if (finishedAnimations === this.animations.length) {
-        this.mixer.removeEventListener("finished", handleFinishedEvent);
-        this.mixer.stopAllAction();
-        this.cells.forEach((cell) => (cell.visible = false));
-
-        setTimeout(() => {
-          this.body.visible = true;
-          this.body.userData.exploded = false;
-        }, 200);
-      }
-    };
-
-    this.mixer.addEventListener("finished", handleFinishedEvent);
-
-    this.cells.forEach((cell) => (cell.visible = true));
-    this.body.visible = false;
-    this.body.userData.exploded = true;
-    this.animations.forEach((animation) => animation.play());
+    this.instances.forEach((instance) => {
+      instance.update(deltaT);
+    });
   }
 }
 
@@ -313,8 +221,8 @@ class Asteroids {
   }
 
   update(deltaT) {
-    this.asteroidInstances.forEach((instance) => {
-      instance.update(deltaT);
+    this.asteroids.forEach((asteroid) => {
+      asteroid.update(deltaT);
     });
   }
 
