@@ -6,6 +6,14 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 const CONTAINER_NAME_REGEX = /^empty\d*$/i;
 const BODY_NAME_REGEX = /^asteroid(?:_?\d+)?$/i;
 
+const randomVector3 = () => {
+  return new THREE.Vector3(
+    Math.random() * 2 - 1,
+    Math.random() * 2 - 1,
+    Math.random() * 2 - 1
+  );
+};
+
 class Asteroid {
   constructor(scene, filePath, loader = new GLTFLoader()) {
     this.scene = scene;
@@ -70,6 +78,26 @@ class Asteroid {
     });
   }
 
+  updateRotation() {
+    const { x, y, z } = this.container.userData.rotationV;
+
+    this.container.rotation.x += x;
+    this.container.rotation.y += y;
+    this.container.rotation.z += z;
+  }
+
+  updatePosition() {
+    const { x, y, z } = this.container.userData.positionV;
+
+    this.container.position.x += x;
+    this.container.position.y += y;
+    this.container.position.z += z;
+  }
+
+  updateMixer(deltaT) {
+    this.mixer.update(deltaT);
+  }
+
   // Public methods
 
   load() {
@@ -85,19 +113,25 @@ class Asteroid {
 
   render(
     position: THREE.Vector3,
-    rotation: THREE.Vector3,
-    positionV: THREE.Vector3,
-    rotationV: THREE.Vector3
+    rotation: THREE.Vector3 = new THREE.Vector3(),
+    positionV: THREE.Vector3 = new THREE.Vector3(),
+    rotationV: THREE.Vector3 = new THREE.Vector3()
   ) {
     this.cells.forEach((cell) => (cell.visible = false));
 
     this.container.position.copy(position);
+    this.container.rotation.copy(new THREE.Euler().setFromVector3(rotation));
+
+    this.container.userData.positionV = positionV;
+    this.container.userData.rotationV = rotationV;
 
     this.scene.add(this.container);
   }
 
   update(deltaT) {
-    this.mixer.update(deltaT);
+    this.updatePosition();
+    this.updateRotation();
+    this.updateMixer(deltaT);
   }
 
   explode() {
@@ -145,7 +179,12 @@ class Asteroids {
 
   render() {
     this.asteroids.forEach((asteroid, index) => {
-      asteroid.render(new THREE.Vector3(index * 3, 0, 0));
+      asteroid.render(
+        new THREE.Vector3(index * 3, 0, 0),
+        new THREE.Vector3(Math.random(), Math.random(), Math.random()),
+        randomVector3().divideScalar(1000),
+        randomVector3().divideScalar(1000)
+      );
     });
   }
 
