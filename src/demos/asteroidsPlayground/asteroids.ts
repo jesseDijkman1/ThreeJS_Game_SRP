@@ -5,6 +5,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 
 class Asteroid {
   constructor(scene, gltf) {
+    console.log(gltf);
     this.scene = scene;
     this.container = gltf.scene.getObjectByName("Empty");
     this.body = gltf.scene.getObjectByName("Asteroid");
