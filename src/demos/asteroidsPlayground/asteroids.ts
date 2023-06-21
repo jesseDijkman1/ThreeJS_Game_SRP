@@ -127,7 +127,7 @@ class AsteroidInstance {
   }
 }
 
-class Asteroid {
+class AsteroidTemplate {
   constructor(scene, filePath, loader = new GLTFLoader()) {
     this.scene = scene;
     this.filePath = filePath;
@@ -191,7 +191,7 @@ class Asteroids {
 
     // Asteroid makers
     this.asteroids = this.filePaths.map(
-      (path) => new Asteroid(this.scene, path, this.loader)
+      (path) => new AsteroidTemplate(this.scene, path, this.loader)
     );
 
     this.asteroidInstances = [];
