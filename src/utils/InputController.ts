@@ -17,11 +17,9 @@ class InputState {
 }
 
 class InputController {
-  renderer: THREE.Renderer;
   state: InputState;
 
-  constructor(renderer, state) {
-    this.renderer = renderer;
+  constructor(state) {
     this.state = state;
 
     this.init();

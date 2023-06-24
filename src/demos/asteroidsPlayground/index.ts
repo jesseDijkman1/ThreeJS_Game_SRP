@@ -24,14 +24,7 @@ export default function () {
 
   // Scene
   const scene = new THREE.Scene();
-  new WorldBox(scene, [
-    "assets/px_eso0932a.jpg",
-    "assets/nx_eso0932a.jpg",
-    "assets/py_eso0932a.jpg",
-    "assets/ny_eso0932a.jpg",
-    "assets/pz_eso0932a.jpg",
-    "assets/nz_eso0932a.jpg",
-  ]);
+  new WorldBox(scene);
 
   // Camera
   const camera = new THREE.PerspectiveCamera(

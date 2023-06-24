@@ -22,12 +22,15 @@ class SpaceShip {
   tiltingVelocity: THREE.Vector3;
   rotationVelocity: THREE.Vector3;
 
+  gltfScene: any;
+  hasLoaded: boolean;
+
   _onLoadCallback: (SpaceShip) => void;
 
-  constructor(scene: THREE.Scene, filePath: string, state) {
+  constructor(scene: THREE.Scene, state: any) {
     this.scene = scene;
     this.loader = new GLTFLoader();
-    this.filePath = filePath;
+    this.filePath = "assets/spaceship.glb";
     this.entity = null;
 
     this.acceleration = -0.05;
@@ -41,36 +44,62 @@ class SpaceShip {
     this.rotationVelocity = new THREE.Vector3(0, 0, 0);
 
     this.state = state;
-    this._onLoadCallback = null;
+    this.hasLoaded = false;
+    // this._onLoadCallback = null;
 
     this.currentRotation = new THREE.Vector3();
 
-    this.load();
+    // this.load();
   }
 
   load() {
-    this.loader.load(
-      this.filePath,
-      this.done.bind(this),
-      this.progress.bind(this),
-      this.error.bind(this)
-    );
+    return new Promise((resolve, reject) => {
+      this.loader.load(
+        this.filePath,
+        this.done.call(this, resolve),
+        this.progress.bind(this),
+        reject
+      );
+    });
   }
 
-  done(gltfScene) {
-    this.entity = gltfScene.scene.children[0];
+  done(resolve) {
+    return (gltf) => {
+      this.gltfScene = gltf.scene;
+      // this.entity = gltf.scene.children[0];
 
+      // this.entity.userData.box = new THREE.Box3();
+      // this.entity.userData.box.setFromObject(this.entity);
+      // // this.entity.userData.box.applyMatrix4(this.entity.matrixWorld);
+
+      // // this.box.
+      // this.helper = new THREE.BoxHelper(this.entity, 0xffff00);
+      // this.scene.add(this.helper);
+
+      // this.scene.add(gltfScene.scene);
+
+      // this._onLoadCallback(this);
+      resolve();
+    };
+  }
+
+  render() {
+    this.entity = this.gltfScene.children[0];
+    this.helper = new THREE.BoxHelper(this.entity, 0xffff00);
+
+    this.scene.add(this.helper, this.entity);
+    // this.entity.updateMatrixWorld(true);
     this.entity.userData.box = new THREE.Box3();
     this.entity.userData.box.setFromObject(this.entity);
     // this.entity.userData.box.applyMatrix4(this.entity.matrixWorld);
 
+    this.hasLoaded = true;
+
+    console.log(this.entity);
+
     // this.box.
-    this.helper = new THREE.BoxHelper(this.entity, 0xffff00);
-    this.scene.add(this.helper);
 
-    this.scene.add(gltfScene.scene);
-
-    this._onLoadCallback(this);
+    // this.scene.add();
   }
 
   progress(xhr) {}
@@ -161,7 +190,7 @@ class SpaceShip {
       // this.entity.userData.box.getCenter(v);
       // console.log(v);
     }
-
+    // this.entity.updateMatrixWorld(true);
     this.entity.userData.box.setFromObject(this.entity);
     // this.entity.userData.box.applyMatrix4(this.entity.matrixWorld);
   }
