@@ -90,13 +90,13 @@ export default function () {
     } catch (err) {}
 
     // particles.generate(1000);
-    particles.render();
+    // particles.render();
 
     window.addEventListener("resize", resize);
     window.requestAnimationFrame(animate);
 
     window.addEventListener("click", (e) => {
-      particles.generate(100);
+      particles.generate(1);
     });
   }
 
