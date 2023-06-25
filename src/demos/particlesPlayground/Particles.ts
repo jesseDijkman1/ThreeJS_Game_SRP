@@ -1,14 +1,6 @@
 // @ts-nocheck
 import * as THREE from "three";
 
-const randomVector3 = () => {
-  return new THREE.Vector3(
-    Math.random() * 2 - 1,
-    Math.random() * 2 - 1,
-    Math.random() * 2 - 1
-  );
-};
-
 const vertexShader = `
   attribute float size;
 
@@ -50,14 +42,16 @@ const fragmentShader = `
 `;
 
 class Particle {
-  constructor({ position, size, color, velocity, speed, lifeSpan }) {
+  constructor({ position, size, color, velocity, speed, lifeSpan, trail = 0 }) {
     this.position = position;
     this.velocity = velocity;
     this.size = size;
     this.color = color;
     this.speed = speed;
-    this.lifeSpan = lifeSpan;
 
+    this.trail = trail;
+
+    this.lifeSpan = lifeSpan;
     this.alive = true;
     this.age = 0;
   }
@@ -116,12 +110,13 @@ class Particles {
   generate(amount = 50) {
     for (let i = 0; i < amount; i++) {
       const particle = new Particle({
-        position: new THREE.Vector3(0, 0, i / (amount / 3)),
+        position: new THREE.Vector3(0, 0, 0),
         size: 100,
         color: new THREE.Color(0xff0000),
-        velocity: new THREE.Vector3(0, 0, -1),
+        velocity: new THREE.Vector3(0.2, 0.2, -1),
         speed: 50,
         lifeSpan: 1,
+        trail: 50,
       });
 
       this.particles.push(particle);
@@ -142,13 +137,15 @@ class Particles {
 
       particle.update(deltaT);
 
-      positions.push(
-        particle.position.x,
-        particle.position.y,
-        particle.position.z
-      );
-      colors.push(particle.color.r, particle.color.g, particle.color.b);
-      sizes.push(particle.size);
+      for (let j = 0; j < particle.trail; j++) {
+        positions.push(
+          particle.position.x - particle.velocity.x * (j / particle.trail),
+          particle.position.y - particle.velocity.y * (j / particle.trail),
+          particle.position.z - particle.velocity.z * (j / particle.trail)
+        );
+        colors.push(particle.color.r, particle.color.g, particle.color.b);
+        sizes.push(particle.size);
+      }
     }
 
     this.geometry.setAttribute(
@@ -165,28 +162,6 @@ class Particles {
         THREE.DynamicDrawUsage
       )
     );
-    // const sizes = [];
-
-    // if (this.size > this.maxSize) {
-    //   this.targetSize = this.minSize;
-    // } else if (this.size < this.minSize) {
-    //   this.targetSize = this.maxSize;
-    // }
-
-    // this.size += deltaT * (this.size < this.targetSize ? 20 : -20);
-
-    // console.log(this.size);
-
-    // for (let i = 0; i < this.particlesAmount; i++) {
-    //   sizes.push(this.size);
-    // }
-
-    // this.geometry.setAttribute(
-    //   "size",
-    //   new THREE.Float32BufferAttribute(sizes, 1).setUsage(
-    //     THREE.DynamicDrawUsage
-    //   )
-    // );
   }
 }
 
