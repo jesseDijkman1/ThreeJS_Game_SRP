@@ -3,7 +3,7 @@ import asteroidsPlayground from "./demos/asteroidsPlayground";
 import particlesPlayground from "./demos/particlesPlayground";
 
 (function () {
-  particlesPlayground();
-  // game();
+  // particlesPlayground();
+  game();
   // asteroidsPlayground();
 })();

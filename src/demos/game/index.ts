@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import Particles from "../../utils/Particles";
 import WorldBox from "../../utils/WorldBox";
 import Asteroids from "../../utils/Asteroids";
 import SpaceShip from "../../utils/SpaceShip";
@@ -37,9 +38,13 @@ export default function () {
   const inputState = new InputState();
   const controller = new InputController(inputState);
 
+  const particles = new Particles(scene);
+
   const worldbox = new WorldBox(scene);
   const spaceship = new SpaceShip(scene, inputState);
   const asteroids = new Asteroids(scene, inputState);
+
+  const raycaster = new THREE.Raycaster();
 
   // Camera
   const camera = new THREE.PerspectiveCamera(
@@ -69,6 +74,7 @@ export default function () {
   const update = () => {
     const deltaTime = clock.getDelta();
 
+    particles.update(deltaTime);
     spaceship.update(deltaTime);
     asteroids.update(deltaTime);
     thirdPersonCamera.update(deltaTime);
@@ -99,13 +105,37 @@ export default function () {
       console.error(err);
     }
 
+    particles.setParent(spaceship.entity);
     spaceship.render();
     asteroids.render(40, 100);
 
     thirdPersonCamera.setTarget(spaceship.entity);
 
     window.requestAnimationFrame(animate);
+
     window.addEventListener("resize", resize);
+
+    window.addEventListener("click", (e) => {
+      const position = spaceship.entity.position.clone();
+      // position.applyQuaternion(spaceship.entity.quaternion);
+
+      const velocity = new THREE.Vector3(0, 0, -1);
+      velocity.applyQuaternion(spaceship.entity.quaternion);
+
+      const particle = particles.create(position, velocity);
+
+      raycaster.set(position, velocity.normalize());
+      console.log(asteroids.asteroidInstances);
+
+      asteroids.asteroidInstances.forEach((instance) => {
+        const intersects = raycaster.intersectObject(instance.body);
+
+        if (intersects.length) instance.expectBulletHit(particle);
+      });
+      // const [intersects,] = raycaster.intersectObjects(
+      //   asteroids.asteroidInstances.map((instance) => instance.body)
+      // );
+    });
   };
 
   init();

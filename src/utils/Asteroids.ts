@@ -93,6 +93,15 @@ class AsteroidInstance {
     this.updateRotation();
     this.updateBox();
     this.updateMixer(deltaT);
+
+    if (this.expectedBullet) {
+      const bulletPos = this.expectedBullet.position;
+      if (this.container.userData.sphere.containsPoint(bulletPos)) {
+        this.expectedBullet.alive = false;
+        this.expectedBullet = null;
+        this.explode();
+      }
+    }
   }
 
   updatePosition() {
@@ -145,6 +154,12 @@ class AsteroidInstance {
     this.body.visible = false;
     this.body.userData.exploded = true;
     this.animations.forEach((animation) => animation.play());
+  }
+
+  expectBulletHit(particle) {
+    if (this.expectedBullet) return;
+
+    this.expectedBullet = particle;
   }
 }
 
