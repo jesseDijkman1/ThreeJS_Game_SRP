@@ -59,23 +59,22 @@ class Particles {
 
     this.particles = [];
 
-    this.uniforms = {
-      pointTexture: {
-        value: new THREE.TextureLoader().load("assets/spark.png"),
-      },
-    };
+    // this.uniforms;
 
     this.geometry = new THREE.BufferGeometry();
-    this.material = new THREE.LineBasicMaterial({ color: 0x0000ff });
-    // this.material = new THREE.ShaderMaterial({
-    //   uniforms: this.uniforms,
-    //   vertexShader,
-    //   fragmentShader,
-    //   blending: THREE.AdditiveBlending,
-    //   depthTest: false,
-    //   // transparent: true,
-    //   vertexColors: true,
-    // });
+    this.shaderMaterial = new THREE.ShaderMaterial({
+      uniforms: {
+        pointTexture: {
+          value: new THREE.TextureLoader().load("assets/spark.png"),
+        },
+      },
+      vertexShader,
+      fragmentShader,
+      blending: THREE.AdditiveBlending,
+      depthTest: false,
+      transparent: true,
+      vertexColors: true,
+    });
   }
 
   generate(amount = 50) {
@@ -142,7 +141,7 @@ class Particles {
       )
     );
 
-    this.points = new THREE.Line(this.geometry, this.shaderMaterial);
+    this.points = new THREE.Points(this.geometry, this.shaderMaterial);
     this.scene.add(this.points);
   }
 
