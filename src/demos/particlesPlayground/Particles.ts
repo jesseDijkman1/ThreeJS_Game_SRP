@@ -19,7 +19,7 @@ const vertexShader = `
 
     vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
 
-    gl_PointSize = size * ( 300.0 / -mvPosition.z );
+    gl_PointSize = size * ( 3.0 / -mvPosition.z );
 
     gl_Position = projectionMatrix * mvPosition;
   }
@@ -29,11 +29,25 @@ const fragmentShader = `
   uniform sampler2D pointTexture;
 
   varying vec3 vColor;
+  varying vec2 uv;
+  varying vec2 cUV;
+  varying vec4 color;
+  varying vec3 originalColor;
+  varying float disc;
 
   void main() {
-    gl_FragColor = vec4( vColor, 1.0 );
+    vec2 uv = vec2(gl_PointCoord.x,1. - gl_PointCoord.y);
+    vec2 cUV = 2.*uv - 1.;
 
-    gl_FragColor = gl_FragColor * texture2D( pointTexture, gl_PointCoord );
+    vec3 originalColor = vec3(250./255.,1./255.,1./255.);
+
+    vec4 color = vec4(0.18/length(cUV));
+
+    color.rgb *= originalColor*30.;
+
+    float disc = length(cUV);
+      
+    gl_FragColor = vec4(color.rgb,color.a - disc);
   }
 `;
 
@@ -71,7 +85,8 @@ class Particles {
       vertexShader,
       fragmentShader,
       blending: THREE.AdditiveBlending,
-      depthTest: false,
+      depthTest: true,
+      depthWrite: true,
       transparent: true,
       vertexColors: true,
     });
@@ -80,15 +95,11 @@ class Particles {
   generate(amount = 50) {
     for (let i = 0; i < amount; i++) {
       const particle = new Particle({
-        position: new THREE.Vector3(
-          Math.random() * 2 - 1,
-          Math.random() * 2 - 1,
-          0
-        ),
-        size: 20,
-        color: new THREE.Color(Math.random(), Math.random(), Math.random()),
+        position: new THREE.Vector3(0, 0, i / (amount / 3)),
+        size: 100,
+        color: new THREE.Color(0xff0000),
         velocity: new THREE.Vector3(0, 0, -1),
-        speed: 10,
+        speed: 50,
       });
 
       this.particles.push(particle);

@@ -96,7 +96,7 @@ export default function () {
     window.requestAnimationFrame(animate);
 
     window.addEventListener("click", (e) => {
-      particles.generate(1);
+      particles.generate(100);
     });
   }
 
