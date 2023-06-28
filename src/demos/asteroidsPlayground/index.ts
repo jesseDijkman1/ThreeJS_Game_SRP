@@ -129,7 +129,7 @@ export default function () {
       if (clickedAsteroid) {
         clickedAsteroid.explode();
       }
-      console.log(clickedAsteroid);
+      // console.log(clickedAsteroid);
     });
     window.addEventListener("resize", resize);
     window.requestAnimationFrame(animate);

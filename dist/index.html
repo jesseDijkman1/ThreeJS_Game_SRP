@@ -8,23 +8,103 @@
     Spaceship - Three.js
   </title>
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       overflow: hidden;
       margin: 0px;
+      font-family: system-ui;
     }
 
-    #canvas {
+    .container {
       position: fixed;
       top: 0;
       right: 0;
       bottom: 0;
       left: 0;
     }
+
+    .canvas,
+    .ui {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+    }
+
+    .ui {
+      --padding: 1rem;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .ui-component {
+      background: rgba(0, 0, 0, .4);
+      color: white;
+      border-radius: 8px;
+      pointer-events: auto;
+      position: absolute;
+      user-select: none;
+    }
+
+    .ui-component.ui-component--static {
+      pointer-events: none;
+    }
+
+    .ui-component--hits {
+      font-weight: 300;
+      font-size: 4rem;
+      top: var(--padding);
+      right: var(--padding);
+      padding: .25em .5em;
+      align-items: flex-end;
+      display: flex;
+
+    }
+
+    .hits__tracker {
+      display: flex;
+      align-items: flex-end;
+    }
+
+    .hits__separator,
+    .hits__total {
+      font-size: .8em;
+      line-height: 1;
+    }
+
+    .hits__count {
+      font-size: 1em;
+      font-weight: 900;
+    }
+
+    .hits__text {
+      font-size: .20em;
+      font-weight: 300;
+      text-transform: uppercase;
+    }
   </style>
 </head>
 
 <body>
-  <canvas id="canvas"></canvas>
+  <div class="container">
+    <canvas id="canvas"></canvas>
+    <div id="ui" class="ui">
+      <p class="ui-component ui-component--static ui-component--hits">
+        <span class="hits__tracker">
+          <span class="hits__count">0</span>
+
+        </span>
+        <span class="hits__text">destroyed</span>
+      </p>
+    </div>
+
+  </div>
   <script type="module" src="bundle.js"></script>
 </body>
 

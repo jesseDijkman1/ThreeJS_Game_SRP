@@ -87,7 +87,7 @@ class Particles {
       fragmentShader,
       blending: THREE.AdditiveBlending,
       depthTest: true,
-      depthWrite: true,
+      depthWrite: false,
       transparent: true,
       vertexColors: true,
     });
@@ -145,9 +145,9 @@ class Particles {
 
       for (let j = 0; j < particle.trail; j++) {
         positions.push(
-          particle.position.x - particle.velocity.x * (j / particle.trail),
-          particle.position.y - particle.velocity.y * (j / particle.trail),
-          particle.position.z - particle.velocity.z * (j / particle.trail)
+          particle.position.x + particle.velocity.x * (j / particle.trail),
+          particle.position.y + particle.velocity.y * (j / particle.trail),
+          particle.position.z + particle.velocity.z * (j / particle.trail)
         );
         colors.push(particle.color.r, particle.color.g, particle.color.b);
         sizes.push(particle.size);

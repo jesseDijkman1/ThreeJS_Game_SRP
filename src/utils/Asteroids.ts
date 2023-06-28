@@ -15,15 +15,19 @@ const randomVector3 = () => {
 };
 
 class AsteroidInstance {
-  constructor(scene, gltfScene, gltfAnimations) {
+  constructor(scene, gltfScene, gltfAnimations, state) {
     this.scene = scene;
     this.gltfScene = gltfScene;
     this.gltfAnimations = gltfAnimations;
+    this.state = state;
 
     this.container = null;
     this.body = null;
     this.cells = [];
     this.animations = [];
+
+    this.delete = false;
+    this.exploded = false;
 
     this.init();
   }
@@ -131,7 +135,10 @@ class AsteroidInstance {
   }
 
   explode() {
+    if (this.exploded) return;
+
     let finishedAnimations = 0;
+    this.exploded = true;
 
     const handleFinishedEvent = (e) => {
       finishedAnimations++;
@@ -140,11 +147,13 @@ class AsteroidInstance {
         this.mixer.removeEventListener("finished", handleFinishedEvent);
         this.mixer.stopAllAction();
         this.cells.forEach((cell) => (cell.visible = false));
+        this.delete = true;
+        this.container.remove();
 
-        setTimeout(() => {
-          this.body.visible = true;
-          this.body.userData.exploded = false;
-        }, 200);
+        // setTimeout(() => {
+        //   this.body.visible = true;
+        //   this.body.userData.exploded = false;
+        // }, 200);
       }
     };
 
@@ -154,6 +163,9 @@ class AsteroidInstance {
     this.body.visible = false;
     this.body.userData.exploded = true;
     this.animations.forEach((animation) => animation.play());
+
+    const destroyedAmount = this.state.getState("asteroids:destroyed");
+    this.state.setState("asteroids:destroyed", destroyedAmount + 1);
   }
 
   expectBulletHit(particle) {
@@ -176,11 +188,12 @@ class AsteroidTemplate {
   }
 
   // Creates an instance (clone)
-  create() {
+  create(state) {
     const instance = new AsteroidInstance(
       this.scene,
       this.gltfScene.clone(),
-      this.gltfAnimations
+      this.gltfAnimations,
+      state
     );
 
     // this.instances.push(instance);
@@ -255,7 +268,7 @@ class Asteroids {
   render(amount, maxRadius = 10) {
     for (let i = 0; i < amount; i++) {
       const template = this.asteroids[i % this.asteroids.length];
-      const asteroid = template.create();
+      const asteroid = template.create(this.state);
 
       const randomPosition = new THREE.Vector3();
       randomPosition.randomDirection();
@@ -270,9 +283,15 @@ class Asteroids {
 
       this.asteroidInstances.push(asteroid);
     }
+
+    this.state.setState("asteroids:total", amount);
+    this.state.setState("asteroids:destroyed", 0);
   }
 
   update(deltaT) {
+    this.asteroidInstances = this.asteroidInstances.filter(
+      (inst) => inst.delete === false
+    );
     this.asteroidInstances.forEach((asteroid) => {
       asteroid.update(deltaT);
     });

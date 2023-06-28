@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { OBB } from "three/examples/jsm/math/OBB";
@@ -70,21 +72,18 @@ class SpaceShip {
 
   render() {
     this.entity = this.gltfScene.children[0];
-    this.helper = new THREE.BoxHelper(this.entity, 0xffff00);
+    // this.helper = new THREE.BoxHelper(this.entity, 0xffff00);
+    this.entity.renderOrder = 201;
+    this.entity.material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+    this.entity.material.depthTest = false;
+    this.entity.material.depthWrite = false;
 
-    this.scene.add(this.helper, this.entity);
-    // this.entity.updateMatrixWorld(true);
+    this.scene.add(this.entity);
+
     this.entity.userData.box = new THREE.Box3();
     this.entity.userData.box.setFromObject(this.entity);
-    // this.entity.userData.box.applyMatrix4(this.entity.matrixWorld);
 
     this.hasLoaded = true;
-
-    console.log(this.entity);
-
-    // this.box.
-
-    // this.scene.add();
   }
 
   progress(xhr) {}
@@ -173,6 +172,13 @@ class SpaceShip {
     }
 
     this.entity.userData.box.setFromObject(this.entity);
+
+    // const boxPosition = new THREE.Vector3(0, 0, -10);
+    // boxPosition.applyQuaternion(controlObject.quaternion);
+    // boxPosition.add(this.entity.position);
+
+    // this.box.position.copy(boxPosition);
+    // this.box.quaternion.copy(this.entity.quaternion);
   }
 
   explode() {

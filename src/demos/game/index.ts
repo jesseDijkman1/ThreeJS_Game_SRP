@@ -7,6 +7,8 @@ import Asteroids from "../../utils/Asteroids";
 import SpaceShip from "../../utils/SpaceShip";
 import ThirdPersonCamera from "../../utils/ThirdPersonCamera";
 import { InputController, InputState } from "../../utils/InputController";
+import Navigator from "../../utils/Navigator";
+import UI from "../../utils/UI";
 
 export default function () {
   const windowProps = {
@@ -19,11 +21,13 @@ export default function () {
 
   // DOM
   const canvas = document.getElementById("canvas") as HTMLCanvasElement;
+  const uiContainer = document.getElementById("ui") as HTMLDivElement;
 
   // Renderer
   const renderer = new THREE.WebGLRenderer({
     canvas,
   });
+
   renderer.setSize(windowProps.width, windowProps.height);
 
   // Scene
@@ -31,8 +35,8 @@ export default function () {
 
   const light = new THREE.PointLight(0xffffff, 12, 100);
   const light2 = new THREE.PointLight(0xffffff, 12, 100);
-  light.position.set(0, 2, -5);
-  light2.position.set(0, -2, 5);
+  light.position.set(0, 2, -15);
+  light2.position.set(0, -20, 5);
   scene.add(light, light2);
 
   const inputState = new InputState();
@@ -41,6 +45,7 @@ export default function () {
   const particles = new Particles(scene);
 
   const worldbox = new WorldBox(scene);
+
   const spaceship = new SpaceShip(scene, inputState);
   const asteroids = new Asteroids(scene, inputState);
 
@@ -54,6 +59,7 @@ export default function () {
     1000
   );
   const thirdPersonCamera = new ThirdPersonCamera(scene, camera);
+  const navigator = new Navigator(scene, camera, spaceship, inputState);
 
   const render = () => {
     renderer.render(scene, camera);
@@ -78,12 +84,14 @@ export default function () {
     spaceship.update(deltaTime);
     asteroids.update(deltaTime);
     thirdPersonCamera.update(deltaTime);
+    navigator.update(deltaTime);
 
     asteroids.asteroidInstances.forEach((instance) => {
       if (
         spaceship.entity.userData.box.intersectsSphere(
           instance.container.userData.sphere
-        )
+        ) &&
+        instance.exploded === false
       ) {
         instance.explode();
       }
@@ -99,8 +107,15 @@ export default function () {
   };
 
   const init = async () => {
+    const ui = new UI(uiContainer, inputState, false);
+
     try {
-      await Promise.all([worldbox.load(), spaceship.load(), asteroids.load()]);
+      await Promise.all([
+        worldbox.load(),
+        spaceship.load(),
+        asteroids.load(),
+        navigator.load(),
+      ]);
     } catch (err) {
       console.error(err);
     }
@@ -108,6 +123,9 @@ export default function () {
     particles.setParent(spaceship.entity);
     spaceship.render();
     asteroids.render(40, 100);
+    navigator.render();
+
+    scene.add(camera);
 
     thirdPersonCamera.setTarget(spaceship.entity);
 
@@ -125,12 +143,14 @@ export default function () {
       const particle = particles.create(position, velocity);
 
       raycaster.set(position, velocity.normalize());
-      console.log(asteroids.asteroidInstances);
+      // console.log(asteroids.asteroidInstances);
 
       asteroids.asteroidInstances.forEach((instance) => {
         const intersects = raycaster.intersectObject(instance.body);
 
-        if (intersects.length) instance.expectBulletHit(particle);
+        if (intersects.length) {
+          instance.expectBulletHit(particle);
+        }
       });
       // const [intersects,] = raycaster.intersectObjects(
       //   asteroids.asteroidInstances.map((instance) => instance.body)
