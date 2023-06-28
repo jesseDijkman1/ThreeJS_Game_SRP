@@ -43,12 +43,23 @@
       pointer-events: none;
     }
 
+    .ui__header {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 1rem;
+      position: absolute;
+      top: var(--padding);
+      right: var(--padding);
+      left: var(--padding);
+    }
+
     .ui-component {
       background: rgba(0, 0, 0, .4);
       color: white;
       border-radius: 8px;
       pointer-events: auto;
-      position: absolute;
+      /* position: absolute; */
       user-select: none;
       z-index: 1;
     }
@@ -91,14 +102,15 @@
     }
 
     .ui-component--health {
+      width: 100%;
       display: flex;
       flex-direction: column;
+      justify-content: center;
       row-gap: 1em;
       font-weight: 300;
       text-transform: uppercase;
       color: white;
-      /* background: rgb(80, 80, 80); */
-      padding: var(--padding);
+      padding: calc(2 * var(--padding)) calc(3 * var(--padding));
       bottom: var(--padding);
       left: calc(5 * var(--padding));
       right: calc(5 * var(--padding));
@@ -160,19 +172,21 @@
   <div class="container">
     <canvas id="canvas"></canvas>
     <div id="ui" class="ui">
-      <p class="ui-component ui-component--static ui-component--hits">
-        <span class="hits__tracker">
-          <span class="hits__count">0</span>
-
-        </span>
-        <span class="hits__text">destroyed</span>
-      </p>
-
-      <div class="ui-component ui-component--static ui-component--health">
-        <strong>Spaceship health</strong>
-        <div class="health__bar">
+      <div class="ui__header">
+        <div class="ui-component ui-component--static ui-component--health">
+          <div class="health__bar">
+          </div>
         </div>
+
+        <p class="ui-component ui-component--static ui-component--hits">
+          <span class="hits__tracker">
+            <span class="hits__count">0</span>
+
+          </span>
+          <span class="hits__text">destroyed</span>
+        </p>
       </div>
+
 
       <div class="effect-overlay"></div>
     </div>
