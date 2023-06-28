@@ -84,6 +84,13 @@ class SpaceShip {
     this.entity.userData.box.setFromObject(this.entity);
 
     this.hasLoaded = true;
+
+    this.state.initState("spaceship:health", 10);
+  }
+
+  applyDamage() {
+    const currentHealth = this.state.getState("spaceship:health");
+    this.state.setState("spaceship:health", currentHealth - 1);
   }
 
   progress(xhr) {}

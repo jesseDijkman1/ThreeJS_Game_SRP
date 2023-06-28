@@ -272,7 +272,9 @@ class Asteroids {
 
       const randomPosition = new THREE.Vector3();
       randomPosition.randomDirection();
-      randomPosition.multiplyScalar(Math.random() * maxRadius);
+      randomPosition.multiplyScalar(
+        Math.random() * (maxRadius / 2) + maxRadius / 2
+      );
 
       asteroid.render(
         randomPosition,
@@ -284,8 +286,8 @@ class Asteroids {
       this.asteroidInstances.push(asteroid);
     }
 
-    this.state.setState("asteroids:total", amount);
-    this.state.setState("asteroids:destroyed", 0);
+    this.state.initState("asteroids:total", amount);
+    this.state.initState("asteroids:destroyed", 0);
   }
 
   update(deltaT) {

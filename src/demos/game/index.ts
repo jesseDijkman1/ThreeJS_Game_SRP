@@ -94,6 +94,7 @@ export default function () {
         instance.exploded === false
       ) {
         instance.explode();
+        spaceship.applyDamage();
       }
     });
 
@@ -159,6 +160,8 @@ export default function () {
   };
 
   init();
+
+  window.THREE = THREE;
 
   // const controls = new OrbitControls(camera, renderer.domElement);
 

@@ -50,6 +50,7 @@
       pointer-events: auto;
       position: absolute;
       user-select: none;
+      z-index: 1;
     }
 
     .ui-component.ui-component--static {
@@ -88,6 +89,70 @@
       font-weight: 300;
       text-transform: uppercase;
     }
+
+    .ui-component--health {
+      display: flex;
+      flex-direction: column;
+      row-gap: 1em;
+      font-weight: 300;
+      text-transform: uppercase;
+      color: white;
+      /* background: rgb(80, 80, 80); */
+      padding: var(--padding);
+      bottom: var(--padding);
+      left: calc(5 * var(--padding));
+      right: calc(5 * var(--padding));
+    }
+
+    .ui-component--health strong {
+      font-weight: 300;
+    }
+
+    .health__bar {
+      display: flex;
+      gap: .5rem;
+    }
+
+    .health__bar>span {
+      height: .6rem;
+      width: 100%;
+      background: goldenrod;
+      opacity: calc(var(--total-lifes) - var(--life))
+    }
+
+    .effect-overlay {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      opacity: 0;
+      z-index: 0;
+      background: rgb(2, 0, 36);
+      background: radial-gradient(circle, rgba(2, 0, 36, 0) 62%, rgba(255, 0, 0, 1) 100%);
+      /* transition: opacity .3s ease; */
+
+      /* animation-play-state: paused; */
+    }
+
+    .effect-overlay.active {
+      animation: damageTaken .3s cubic-bezier(1.000, 0.095, 0.240, 1.650) forwards;
+      /* animation-play-state: running; */
+    }
+
+    @keyframes damageTaken {
+      0% {
+        opacity: 0;
+      }
+
+      50% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0;
+      }
+    }
   </style>
 </head>
 
@@ -102,7 +167,16 @@
         </span>
         <span class="hits__text">destroyed</span>
       </p>
+
+      <div class="ui-component ui-component--static ui-component--health">
+        <strong>Spaceship health</strong>
+        <div class="health__bar">
+        </div>
+      </div>
+
+      <div class="effect-overlay"></div>
     </div>
+
 
   </div>
   <script type="module" src="bundle.js"></script>

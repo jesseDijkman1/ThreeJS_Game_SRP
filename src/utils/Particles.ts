@@ -118,7 +118,7 @@ class Particles {
       velocity,
       speed: 50,
       lifeSpan: 3,
-      trail: 50,
+      trail: 150,
     });
 
     this.particles.push(particle);
@@ -145,12 +145,14 @@ class Particles {
 
       for (let j = 0; j < particle.trail; j++) {
         positions.push(
-          particle.position.x + particle.velocity.x * (j / particle.trail),
-          particle.position.y + particle.velocity.y * (j / particle.trail),
-          particle.position.z + particle.velocity.z * (j / particle.trail)
+          particle.position.x +
+            particle.velocity.x * (j / (particle.trail / 5)),
+          particle.position.y +
+            particle.velocity.y * (j / (particle.trail / 5)),
+          particle.position.z + particle.velocity.z * (j / (particle.trail / 5))
         );
         colors.push(particle.color.r, particle.color.g, particle.color.b);
-        sizes.push(particle.size);
+        sizes.push(particle.size * (j / particle.trail));
       }
     }
 

@@ -4,11 +4,19 @@ import * as THREE from "three";
 
 class InputState {
   _state: Record<string, any>;
-  _listeners: Record<string, Array<() => void>>;
+  _changeListeners: Record<string, Array<() => void>>;
+  _initListeners: Record<string, Array<() => void>>;
 
   constructor(initialState = {}) {
     this._state = { ...initialState };
-    this._listeners = {};
+    this._changeListeners = {};
+    this._initListeners = {};
+  }
+
+  initState(key: string, defaultValue: any) {
+    this._state[key] = defaultValue;
+
+    this.dispatchInitEvent(key);
   }
 
   getState(key?: string): any {
@@ -18,20 +26,27 @@ class InputState {
   setState(key: string, value: any) {
     this._state[key] = value;
 
-    // console.log("OIJ", key, this._state);
-
     this.dispatchChangeEvent(key);
   }
 
   dispatchChangeEvent(key: string) {
-    (this._listeners[key] ?? []).forEach((cb) => {
+    (this._changeListeners[key] ?? []).forEach((cb) => {
+      cb(this._state[key]);
+    });
+  }
+
+  dispatchInitEvent(key: string) {
+    (this._initListeners[key] ?? []).forEach((cb) => {
       cb(this._state[key]);
     });
   }
 
   onStateChange(key: string, cb: () => void) {
-    console.log(key, this);
-    this._listeners[key] = [cb, ...(this._listeners[key] ?? [])];
+    this._changeListeners[key] = [cb, ...(this._changeListeners[key] ?? [])];
+  }
+
+  onStateInit(key: string, cb: () => void) {
+    this._initListeners[key] = [cb, ...(this._initListeners[key] ?? [])];
   }
 }
 
