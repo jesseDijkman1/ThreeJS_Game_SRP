@@ -35,9 +35,20 @@ export default function () {
 
   const light = new THREE.PointLight(0xffffff, 12, 100);
   const light2 = new THREE.PointLight(0xffffff, 12, 100);
+  const light3 = new THREE.PointLight(0xffffff, 12, 200);
+  const light4 = new THREE.PointLight(0xffffff, 12, 200);
+  const light5 = new THREE.PointLight(0xffffff, 12, 200);
+  const light6 = new THREE.PointLight(0xffffff, 12, 200);
+  const light7 = new THREE.PointLight(0xffffff, 12, 200);
   light.position.set(0, 2, -15);
   light2.position.set(0, -20, 5);
-  scene.add(light, light2);
+  light3.position.set(50, 50, 50);
+  light4.position.set(-50, -50, -50);
+  light5.position.set(-50, 50, 50);
+  light6.position.set(50, -50, 50);
+  light7.position.set(50, 50, -50);
+  // light6.position.set(50, -50, 50);
+  scene.add(light, light2, light3, light4, light5, light6, light7);
 
   const inputState = new InputState();
   const controller = new InputController(inputState);
@@ -77,8 +88,44 @@ export default function () {
     render();
   };
 
+  let blasterTime = 0;
   const update = () => {
     const deltaTime = clock.getDelta();
+
+    const currentInputState = inputState.getState();
+
+    if (currentInputState.shooting) {
+      console.log(blasterTime);
+      if (blasterTime === 0) {
+        // this.fire();
+        const position = spaceship.getBlasterPosition();
+        // position.applyQuaternion(spaceship.entity.quaternion);
+
+        const velocity = new THREE.Vector3(0, 0, -1);
+        velocity.applyQuaternion(spaceship.entity.quaternion);
+
+        const particle = particles.create(position, velocity);
+
+        raycaster.set(position, velocity.normalize());
+        // console.log(asteroids.asteroidInstances);
+
+        asteroids.asteroidInstances.forEach((instance) => {
+          const intersects = raycaster.intersectObject(instance.body);
+
+          if (intersects.length) {
+            instance.expectBulletHit(particle);
+          }
+        });
+      }
+
+      blasterTime += deltaTime;
+
+      if (blasterTime >= 0.1) {
+        blasterTime = 0;
+      }
+    } else {
+      blasterTime = 0;
+    }
 
     particles.update(deltaTime);
     spaceship.update(deltaTime);
@@ -135,24 +182,6 @@ export default function () {
     window.addEventListener("resize", resize);
 
     window.addEventListener("click", (e) => {
-      const position = spaceship.entity.position.clone();
-      // position.applyQuaternion(spaceship.entity.quaternion);
-
-      const velocity = new THREE.Vector3(0, 0, -1);
-      velocity.applyQuaternion(spaceship.entity.quaternion);
-
-      const particle = particles.create(position, velocity);
-
-      raycaster.set(position, velocity.normalize());
-      // console.log(asteroids.asteroidInstances);
-
-      asteroids.asteroidInstances.forEach((instance) => {
-        const intersects = raycaster.intersectObject(instance.body);
-
-        if (intersects.length) {
-          instance.expectBulletHit(particle);
-        }
-      });
       // const [intersects,] = raycaster.intersectObjects(
       //   asteroids.asteroidInstances.map((instance) => instance.body)
       // );

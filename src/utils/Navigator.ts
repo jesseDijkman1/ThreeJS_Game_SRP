@@ -108,13 +108,13 @@ class Navigator {
     shipCrosshairPosition.add(this.spaceship.entity.position);
 
     this.shipCrosshair.position.copy(shipCrosshairPosition);
-    this.shipCrosshair.quaternion.copy(this.spaceship.entity.quaternion);
+    this.shipCrosshair.quaternion.copy(this.camera.quaternion);
 
     cameraCrosshairPosition.applyQuaternion(this.spaceship.entity.quaternion);
     cameraCrosshairPosition.add(this.spaceship.entity.position);
 
     this.cameraCrosshair.position.copy(cameraCrosshairPosition);
-    this.cameraCrosshair.quaternion.copy(this.spaceship.entity.quaternion);
+    this.cameraCrosshair.quaternion.copy(this.camera.quaternion);
   }
 
   progress() {}
