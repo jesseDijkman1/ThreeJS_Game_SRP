@@ -61,6 +61,9 @@ class Navigator {
       })
     );
 
+    this.cameraCrosshair.renderOrder = 99;
+    this.cameraCrosshair.material.depthTest = false;
+
     this.shipCrosshair.renderOrder = 100;
     this.shipCrosshair.material.depthTest = false;
     // this.shipCrosshair.material.depthWrite = false;

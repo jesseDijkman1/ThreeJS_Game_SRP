@@ -76,6 +76,7 @@
       pointer-events: none;
     }
 
+    .ui-component--asteroid-count,
     .ui-component--hits {
       transform: translateX(calc(100% + var(--padding)));
       font-weight: 300;
@@ -88,22 +89,30 @@
 
     }
 
+    .asteroid-count__tracker,
     .hits__tracker {
       display: flex;
-      align-items: flex-end;
+      align-items: center;
+      column-gap: .12em;
     }
 
+    .asteroid-count__separator,
+    .asteroid-count__total,
     .hits__separator,
     .hits__total {
-      font-size: .8em;
+      font-size: .4em;
       line-height: 1;
+      vertical-align: top;
+
     }
 
+    .asteroid-count__count,
     .hits__count {
       font-size: 1em;
       font-weight: 900;
     }
 
+    .asteroid-count__text,
     .hits__text {
       font-size: .20em;
       font-weight: 300;
@@ -211,6 +220,7 @@
       transform: translateY(0);
     }
 
+    .ui__header.show .ui-component--asteroid-count,
     .ui__header.show .ui-component--hits {
       transform: translateX(0);
     }
@@ -230,9 +240,9 @@
         <p class="ui-component ui-component--static ui-component--hits">
           <span class="hits__tracker">
             <span class="hits__count">0</span>
-
+            <span class="hits__separator">/</span>
+            <span class="hits__total">40</span>
           </span>
-          <span class="hits__text">destroyed</span>
         </p>
       </div>
 
