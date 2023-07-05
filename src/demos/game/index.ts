@@ -47,7 +47,6 @@ export default function () {
   light5.position.set(-50, 50, 50);
   light6.position.set(50, -50, 50);
   light7.position.set(50, 50, -50);
-  // light6.position.set(50, -50, 50);
   scene.add(light, light2, light3, light4, light5, light6, light7);
 
   const inputState = new InputState();

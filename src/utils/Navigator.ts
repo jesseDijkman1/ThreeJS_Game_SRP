@@ -40,6 +40,7 @@ class Navigator {
   }
 
   render() {
+    this.renderArrow();
     this.renderCrosshair();
   }
 
@@ -72,12 +73,14 @@ class Navigator {
   }
 
   renderArrow() {
-    this.arrow.material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+    const light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(10, 0, 1);
+    light.target = this.arrow;
 
     this.arrow.position.z = -10;
     this.arrow.position.y = -6;
 
-    this.camera.add(this.arrow);
+    this.camera.add(this.arrow, light);
   }
 
   update(deltaT) {
@@ -115,6 +118,20 @@ class Navigator {
 
     this.cameraCrosshair.position.copy(cameraCrosshairPosition);
     this.cameraCrosshair.quaternion.copy(this.camera.quaternion);
+
+    const cameraShipAngleZ = Math.atan2(
+      this.spaceship.entity.position.x - this.camera.position.x,
+      this.spaceship.entity.position.z - this.camera.position.z
+    );
+
+    const angleWorldOriginZ = Math.atan2(
+      this.spaceship.entity.position.x,
+      this.spaceship.entity.position.z
+    );
+
+    const yAngle = angleWorldOriginZ - cameraShipAngleZ + Math.PI / 2;
+
+    this.arrow.rotation.y = yAngle;
   }
 
   progress() {}
