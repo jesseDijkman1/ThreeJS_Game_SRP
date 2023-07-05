@@ -88,7 +88,7 @@ export default function () {
       //   asteroids.explode();
       // }
 
-      console.log(intersects);
+      // console.log(intersects);
     };
   }
 

@@ -95,11 +95,8 @@ export default function () {
     const currentInputState = inputState.getState();
 
     if (currentInputState.shooting) {
-      console.log(blasterTime);
       if (blasterTime === 0) {
-        // this.fire();
         const position = spaceship.getBlasterPosition();
-        // position.applyQuaternion(spaceship.entity.quaternion);
 
         const velocity = new THREE.Vector3(0, 0, -1);
         velocity.applyQuaternion(spaceship.entity.quaternion);
@@ -107,7 +104,6 @@ export default function () {
         const particle = particles.create(position, velocity);
 
         raycaster.set(position, velocity.normalize());
-        // console.log(asteroids.asteroidInstances);
 
         asteroids.asteroidInstances.forEach((instance) => {
           const intersects = raycaster.intersectObject(instance.body);
@@ -210,92 +206,4 @@ export default function () {
   };
 
   init();
-
-  window.THREE = THREE;
-
-  // const controls = new OrbitControls(camera, renderer.domElement);
-
-  // const light = new THREE.PointLight(0xffffff, 12, 100);
-  // light.position.set(0, 2, -5);
-
-  // scene.add(light);
-
-  // function resize() {
-  //   windowProps.width = window.innerWidth;
-  //   windowProps.height = window.innerHeight;
-
-  //   camera.aspect = windowProps.width / windowProps.height;
-  //   camera.updateProjectionMatrix();
-
-  //   renderer.setSize(windowProps.width, windowProps.height);
-
-  //   render();
-  //   -1;
-  // }
-
-  // let asteroids;
-  // const mixers = [];
-  // const clock = new THREE.Clock();
-
-  // function animate() {
-  //   requestAnimationFrame(animate);
-
-  //   // console.log(intersects);
-  //   const deltaTime = clock.getDelta();
-
-  //   controls.update();
-  //   asteroids.update(deltaTime);
-  //   // mixers.forEach((mixer) => mixer.update(deltaTime));
-
-  //   render();
-  // }
-
-  // function render() {
-  //   renderer.render(scene, camera);
-  // }
-
-  // async function init() {
-  //   // asteroids = new Asteroids(scene, "assets/asteroid-1.glb");
-  //   asteroids = new Asteroids(scene, [
-  //     "assets/asteroid-1.glb",
-  //     "assets/asteroid-2.glb",
-  //     "assets/asteroid-3.glb",
-  //     "assets/asteroid-4.glb",
-  //     "assets/asteroid-5.glb",
-  //     "assets/asteroid-6.glb",
-  //     "assets/asteroid-7.glb",
-  //     "assets/asteroid-8.glb",
-  //   ]);
-
-  //   // scene.add(boxMesh);
-  //   render();
-  //   // console.log(1);
-
-  //   try {
-  //     await asteroids.load();
-  //     asteroids.render();
-  //     // mixers.push(asteroids.mixer);
-  //     // console.log(asteroids);
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-
-  //   window.addEventListener("click", (e) => {
-  //     windowProps.pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
-  //     windowProps.pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
-
-  //     raycaster.setFromCamera(windowProps.pointer, camera);
-
-  //     const clickedAsteroid = asteroids.getClickedAsteroid(raycaster);
-
-  //     if (clickedAsteroid) {
-  //       clickedAsteroid.explode();
-  //     }
-  //     console.log(clickedAsteroid);
-  //   });
-  //   window.addEventListener("resize", resize);
-  //   window.requestAnimationFrame(animate);
-  // }
-
-  // init();
 }

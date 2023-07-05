@@ -37,7 +37,6 @@ class HitsComponent extends UIComponent {
   }
 
   updateCounter(n: number) {
-    console.log("O", this);
     this.elements.count.textContent = n;
   }
 }
@@ -56,7 +55,6 @@ class EffectOverlay extends UIComponent {
   }
 
   displayEffect() {
-    console.log("oi");
     this.elements.overlay.classList.remove("active");
     this.elements.overlay.offsetHeight; // Repaint
     this.elements.overlay.classList.add("active");
