@@ -97,6 +97,72 @@ class HealthBar extends UIComponent {
   }
 }
 
+class Options extends UIComponent {
+  constructor(root, state) {
+    super("options", root, state);
+
+    this.init();
+  }
+
+  init() {
+    this.registerElement("container", ".ui-component--options");
+    this.registerElement("startButton", ".ui__button--start");
+    this.registerElement("continueButton", ".ui__button--continue");
+    this.registerElement("restartButton", ".ui__button--restart");
+
+    this.state.onStateChange("game:loop", this.handleGameLoopChange.bind(this));
+
+    this.elements.startButton.addEventListener("click", (e) => {
+      this.state.setState("ui", "visible");
+      this.state.setState("game:loop", "running");
+    });
+
+    this.elements.continueButton.addEventListener("click", (e) => {
+      this.state.setState("game:loop", "running");
+    });
+
+    this.elements.restartButton.addEventListener("click", (e) => {
+      // this.state.setState("game:loop", "running");
+      window.location.reload();
+    });
+
+    window.addEventListener("keydown", (e) => {
+      if (e.code !== "Escape") return;
+
+      const gameState = this.state.getState("game:loop");
+
+      if (gameState === "running") {
+        this.state.setState("game:loop", "paused");
+      } else {
+        this.state.setState("game:loop", "running");
+      }
+    });
+  }
+
+  handleGameLoopChange(gameLoopState) {
+    switch (gameLoopState) {
+      case "running":
+        this.elements.container.hidden = true;
+        this.elements.startButton.hidden = true;
+        break;
+      case "paused":
+        this.elements.container.hidden = false;
+        this.elements.continueButton.hidden = false;
+        break;
+      case "ended":
+        this.elements.container.hidden = false;
+        this.elements.restartButton.hidden = false;
+        break;
+      default:
+        break;
+    }
+  }
+
+  handleContinue() {}
+
+  handleRestart() {}
+}
+
 class UI {
   constructor(root, state, visible = false) {
     this.root = root;
@@ -105,9 +171,14 @@ class UI {
     this.visible = visible;
     this.components = [];
 
+    this.header = root.querySelector(".ui__header");
+
     this.addComponent(HitsComponent);
     this.addComponent(EffectOverlay);
     this.addComponent(HealthBar);
+    this.addComponent(Options);
+
+    this.init();
   }
 
   addComponent(_UIComponentClass) {
@@ -119,6 +190,19 @@ class UI {
   show() {}
 
   hide() {}
+
+  init() {
+    this.state.onStateChange("game:loop", (state) => {
+      switch (state) {
+        case "running":
+          this.header.classList.add("show");
+          break;
+        case "paused":
+        case "ended":
+          this.header.classList.remove("show");
+      }
+    });
+  }
 }
 
 export default UI;

@@ -17,7 +17,7 @@ export default function () {
     pointer: new THREE.Vector2(),
   };
 
-  const clock = new THREE.Clock();
+  const clock = new THREE.Clock(false);
 
   // DOM
   const canvas = document.getElementById("canvas") as HTMLCanvasElement;
@@ -148,7 +148,11 @@ export default function () {
     render();
   };
 
+  let isRunning = false;
+
   const animate = () => {
+    if (isRunning === false) return;
+
     window.requestAnimationFrame(animate);
 
     update();
@@ -177,14 +181,27 @@ export default function () {
 
     thirdPersonCamera.setTarget(spaceship.entity);
 
-    window.requestAnimationFrame(animate);
-
     window.addEventListener("resize", resize);
 
-    window.addEventListener("click", (e) => {
-      // const [intersects,] = raycaster.intersectObjects(
-      //   asteroids.asteroidInstances.map((instance) => instance.body)
-      // );
+    inputState.onStateChange("game:loop", (value) => {
+      switch (value) {
+        case "running":
+          clock.start();
+          isRunning = true;
+          window.requestAnimationFrame(animate);
+          break;
+        case "ended":
+        case "paused":
+          clock.stop();
+          isRunning = false;
+          break;
+        default:
+          break;
+      }
+    });
+
+    inputState.onStateChange("spaceship:health", (lifes) => {
+      if (lifes === 0) inputState.setState("game:loop", "ended");
     });
   };
 

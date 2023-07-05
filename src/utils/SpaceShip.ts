@@ -195,7 +195,7 @@ class SpaceShip {
 
   render() {
     this.entity = this.gltfScene.children[0];
-    // this.helper = new THREE.BoxHelper(this.entity, 0xffff00);
+
     this.entity.renderOrder = 201;
     this.entity.material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
     this.entity.material.depthTest = false;
@@ -208,7 +208,7 @@ class SpaceShip {
 
     this.hasLoaded = true;
 
-    this.state.initState("spaceship:health", 10);
+    this.state.initState("spaceship:health", 3);
 
     this.gun = new Gun(this.scene, this.state);
     this.gun.setShip(this.entity);
@@ -243,8 +243,6 @@ class SpaceShip {
     this.blasters = [...this.blasters, blaster];
 
     return position;
-
-    // this.gun.fire();
   }
 
   update(timeElapsed) {

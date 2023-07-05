@@ -6,11 +6,14 @@ class InputState {
   _state: Record<string, any>;
   _changeListeners: Record<string, Array<() => void>>;
   _initListeners: Record<string, Array<() => void>>;
+  _eventListeners: Record<string, Array<() => void>>;
 
   constructor(initialState = {}) {
     this._state = { ...initialState };
     this._changeListeners = {};
     this._initListeners = {};
+
+    this._eventListeners = {};
   }
 
   initState(key: string, defaultValue: any) {
@@ -41,12 +44,23 @@ class InputState {
     });
   }
 
-  onStateChange(key: string, cb: () => void) {
+  onStateChange(key: string, cb: (arguments) => void) {
     this._changeListeners[key] = [cb, ...(this._changeListeners[key] ?? [])];
   }
 
   onStateInit(key: string, cb: () => void) {
     this._initListeners[key] = [cb, ...(this._initListeners[key] ?? [])];
+  }
+
+  on(event, callback) {
+    this._eventListeners[event] = [
+      callback,
+      ...(this._eventListeners[event] ?? []),
+    ];
+  }
+
+  dispatchEvent(event) {
+    (this._eventListeners[event] ?? []).forEach((callback) => callback());
   }
 }
 
