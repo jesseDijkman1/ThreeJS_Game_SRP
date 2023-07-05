@@ -73,14 +73,15 @@ class Navigator {
   }
 
   renderArrow() {
-    const light = new THREE.DirectionalLight(0xffffff, 1);
-    light.position.set(10, 0, 1);
-    light.target = this.arrow;
+    this.arrow.material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    // const light = new THREE.DirectionalLight(0xffffff, 1);
+    // light.position.set(10, 0, 1);
+    // light.target = this.arrow;
 
     this.arrow.position.z = -10;
     this.arrow.position.y = -6;
 
-    this.camera.add(this.arrow, light);
+    this.camera.add(this.arrow);
   }
 
   update(deltaT) {

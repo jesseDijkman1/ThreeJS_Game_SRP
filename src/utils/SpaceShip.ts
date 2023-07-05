@@ -169,6 +169,9 @@ class SpaceShip {
 
     this.blasters = [];
 
+    this.boosterLength = 100;
+    this.boosterCircles = [];
+
     this.currentRotation = new THREE.Vector3();
 
     this.particleSystem = new Particles(scene);
@@ -200,6 +203,31 @@ class SpaceShip {
     this.entity.material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
     this.entity.material.depthTest = false;
     this.entity.material.depthWrite = false;
+
+    const circleGroup = new THREE.Group();
+
+    for (let i = 0; i < this.boosterLength; i++) {
+      const n = i / this.boosterLength;
+      const circleGeometry = new THREE.CircleGeometry((1 - n) * 0.04, 32);
+      const color = new THREE.Color(1, n / 10, 0);
+      const circleMaterial = new THREE.MeshBasicMaterial({
+        color,
+        blending: THREE.AdditiveBlending,
+      });
+      const circle = new THREE.Mesh(circleGeometry, circleMaterial);
+      circle.position.z = i / (this.boosterLength * 10);
+
+      circle.userData.index = i;
+      circle.userData.originalPosition = circle.position.clone();
+
+      this.boosterCircles.push(circle);
+
+      circleGroup.add(circle);
+    }
+
+    circleGroup.position.z = 0.15;
+
+    this.entity.add(circleGroup);
 
     this.scene.add(this.entity);
 
@@ -332,6 +360,27 @@ class SpaceShip {
 
     // this.box.position.copy(boxPosition);
     // this.box.quaternion.copy(this.entity.quaternion);
+
+    if (currentInputState.boost) {
+      this.boosterCircles.forEach((circle) => {
+        const index = circle.userData.index;
+
+        const originalPosition = circle.position.clone();
+        const position = new THREE.Vector3(
+          0,
+          0,
+          index / (this.boosterLength * 0.75)
+        );
+
+        originalPosition.lerp(position, timeElapsed);
+
+        circle.position.copy(originalPosition);
+      });
+    } else {
+      this.boosterCircles.forEach((circle) => {
+        circle.position.lerp(circle.userData.originalPosition, timeElapsed);
+      });
+    }
   }
 
   explode() {
