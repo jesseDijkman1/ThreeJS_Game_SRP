@@ -15,6 +15,7 @@ class Navigator {
     this.cameraCrosshair = null;
 
     this.crossHairLerpNumber = 0;
+    this.arrowOpacity = 0;
 
     this.loader = new GLTFLoader();
     this.filePath = "assets/arrow.glb";
@@ -76,10 +77,11 @@ class Navigator {
   }
 
   renderArrow() {
-    this.arrow.material = new THREE.MeshBasicMaterial({ color: 0xffffff });
-    // const light = new THREE.DirectionalLight(0xffffff, 1);
-    // light.position.set(10, 0, 1);
-    // light.target = this.arrow;
+    this.arrow.material = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0,
+    });
 
     this.arrow.position.z = -10;
     this.arrow.position.y = -6;
@@ -134,6 +136,21 @@ class Navigator {
     );
 
     const yAngle = angleWorldOriginZ - cameraShipAngleZ + Math.PI / 2;
+
+    if (
+      this.spaceship.entity.position.distanceTo(new THREE.Vector3(0, 0, 0)) >
+      100
+    ) {
+      if (this.arrowOpacity < 1) this.arrowOpacity += deltaT;
+      if (this.arrowOpacity > 1) this.arrowOpacity = 1;
+    } else {
+      if (this.arrowOpacity > 0) this.arrowOpacity -= deltaT;
+      if (this.arrowOpacity < 0) this.arrowOpacity = 0;
+    }
+
+    if (this.arrow.material.opacity != this.arrowOpacity) {
+      this.arrow.material.opacity = this.arrowOpacity;
+    }
 
     this.arrow.rotation.y = yAngle;
   }

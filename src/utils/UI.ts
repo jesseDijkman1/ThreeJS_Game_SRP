@@ -106,6 +106,7 @@ class Options extends UIComponent {
 
   init() {
     this.registerElement("container", ".ui-component--options");
+    this.registerElement("loader", ".ui__loader");
     this.registerElement("startButton", ".ui__button--start");
     this.registerElement("continueButton", ".ui__button--continue");
     this.registerElement("restartButton", ".ui__button--restart");
@@ -141,6 +142,10 @@ class Options extends UIComponent {
 
   handleGameLoopChange(gameLoopState) {
     switch (gameLoopState) {
+      case "ready":
+        this.elements.loader.hidden = true;
+        this.elements.startButton.hidden = false;
+        break;
       case "running":
         this.elements.container.hidden = true;
         this.elements.startButton.hidden = true;

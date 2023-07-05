@@ -30,6 +30,7 @@
       right: 0;
       bottom: 0;
       left: 0;
+      background: black;
     }
 
     .canvas,
@@ -195,6 +196,29 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      backdrop-filter: blur(20px);
+    }
+
+    .ui__loader {
+      width: 100px;
+      height: 100px;
+      border: solid 15px white;
+      border-left-color: transparent;
+      border-right-color: transparent;
+      border-bottom-color: transparent;
+      border-radius: 9999px;
+      animation: loader .5s linear infinite;
+    }
+
+    @keyframes loader {
+      0% {
+        transform: rotate(0)
+      }
+
+      100% {
+        transform: rotate(360deg)
+      }
+
     }
 
     .ui__button {
@@ -250,7 +274,9 @@
       <div class="effect-overlay"></div>
 
       <div class="ui-component ui-component--options">
-        <button type="button" class="ui__button ui__button--start">Start</button>
+        <div class="ui__loader"></div>
+
+        <button type="button" class="ui__button ui__button--start" hidden>Start</button>
         <button type="button" class="ui__button ui__button--continue" hidden>Continue</button>
         <button type="button" class="ui__button ui__button--restart" hidden>Restart</button>
       </div>

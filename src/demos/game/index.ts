@@ -68,6 +68,7 @@ export default function () {
     0.1,
     1000
   );
+
   const thirdPersonCamera = new ThirdPersonCamera(scene, camera);
   const navigator = new Navigator(scene, camera, spaceship, inputState);
 
@@ -181,6 +182,10 @@ export default function () {
     thirdPersonCamera.setTarget(spaceship.entity);
 
     window.addEventListener("resize", resize);
+
+    inputState.setState("game:loop", "ready");
+    thirdPersonCamera.update(1);
+    render();
 
     inputState.onStateChange("game:loop", (value) => {
       switch (value) {
