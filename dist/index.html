@@ -248,6 +248,32 @@
     .ui__header.show .ui-component--hits {
       transform: translateX(0);
     }
+
+    .ui__key-button {
+      background: black;
+      border: solid 1px #888;
+      padding: .2em .4em;
+      font-size: inherit;
+      color: white;
+      display: inline-block;
+      margin-right: 1em;
+    }
+
+    .ui__controls {
+      list-style: none;
+      position: absolute;
+      left: var(--padding);
+      top: var(--padding);
+      bottom: var(--padding);
+      margin: auto;
+      height: fit-content;
+      display: flex;
+      flex-direction: column;
+      row-gap: 1rem;
+      font-size: 1.4rem;
+    }
+
+    .ui__controls li {}
   </style>
 </head>
 
@@ -275,6 +301,15 @@
 
       <div class="ui-component ui-component--options">
         <div class="ui__loader"></div>
+        <ul class="ui__controls">
+          <li><span class="ui__key-button">W</span> Tilt down</li>
+          <li><span class="ui__key-button">S</span> Tilt up</li>
+          <li><span class="ui__key-button">A</span> Spin left</li>
+          <li><span class="ui__key-button">D</span> Spin right</li>
+          <li><span class="ui__key-button">Shift</span> Boost</li>
+          <li><span class="ui__key-button">Space</span> Shoot</li>
+          <li><span class="ui__key-button">Esc</span> Pause</li>
+        </ul>
 
         <button type="button" class="ui__button ui__button--start" hidden>Start</button>
         <button type="button" class="ui__button ui__button--continue" hidden>Continue</button>
